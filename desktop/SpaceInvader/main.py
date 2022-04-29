@@ -1,4 +1,5 @@
 from ctypes.wintypes import PMSG
+from hashlib import sha3_256
 import pygame as pg
 from pygame import mixer
 
@@ -60,7 +61,7 @@ for i in range(num_of_enemies):
     img_src = "assets/gps_ufo_" + str(i) + ".png"
     enemy_img.append(pg.image.load(img_src))
     enemy_x.append(random.randint(100,600))
-    enemy_y.append(random.randint(50, 100))
+    enemy_y.append(random.randint(50, 100)) 
     enemyX_change.append(2)
     enemyY_change.append(30) #this control the descending of the enemy when touch the boundaries
 
@@ -71,16 +72,30 @@ score_value = 0
 font = pg.font.Font('freesansbold.ttf', 32)
 # Define the position of the score.
 textX = 10 
-textY = 10
+textY = 30
+
+# Best Score
+read_file_record = open("assets/record.txt", "r")
+record = int(read_file_record.readline())
+print("Best Record: " + str(record))
+font_bscore = pg.font.Font('freesansbold.ttf', 12)
+text_bscore_X = 12 
+text_bscore_Y = 70
+read_file_record.close()
 
 # Define the function to the Score
-def show_score(x,y):
+def show_score(x,y,xb,yb):
     score = font.render("Score: " + str(score_value), True, (255,255,255))
     screen.blit(score, (x, y))
+    best_score = font_bscore.render("Best Score: " + str(record), True, (255,255,255))
+    screen.blit(best_score, (xb, yb))
+
+
 
 
 # Game Over -------------------------------------------
 over_font = pg.font.Font('freesansbold.ttf', 64)
+
 
 
 # Define the function to the player
@@ -158,14 +173,12 @@ while running:
 #   Movments of the enemy and Collision 
     for i in range(num_of_enemies):
         
-        print("[i]" + str(i)) 
-        print("left enemyX_change[i]" + str(enemyX_change[i]))
-        print("left enemy_y[i]" + str(enemy_y[i]))
-        
-        
         # Game Over
         if enemy_y[i] > 440:
-
+            if score_value >= record:
+                file_record = open("assets/record.txt", "w")
+                file_record.write(str(score_value))
+                file_record.close()
             game_over_text()
             break
         
@@ -211,7 +224,7 @@ while running:
     player(player_x, player_y)    
         
 #   Call the player function
-    show_score(textX, textY)    
+    show_score(textX, textY, text_bscore_X, text_bscore_Y)    
 
 #   to work properly we need to add a update function
     pg.display.update()
